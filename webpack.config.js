@@ -1,6 +1,6 @@
 /* eslint-disable */
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
-
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
 
@@ -28,6 +28,6 @@ export default {
       title: 'RSS агрегатор',
       template: 'index.html',
     }),
-    new miniCssExtractPlugin(),
+    new MiniCssExtractPlugin(),
   ],
 };
