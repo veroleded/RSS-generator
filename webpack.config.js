@@ -28,8 +28,8 @@ export default {
       template: 'index.html',
     }),
   ],
-  // output: { 
-  //   path: path.resolve(__dirname, './dist'),
-  //   filename: 'main.js',
-  // },
+  output: { 
+    path: path.resolve(__dirname, './dist'),
+    filename: 'main.js',
+  },
 };
