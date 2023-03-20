@@ -24,10 +24,12 @@ export default {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      title: 'RSS агрегатор',
       template: 'index.html',
     }),
   ],
-  output: {
-    clean: true,
-  },
+  // output: { 
+  //   path: path.resolve(__dirname, './dist'),
+  //   filename: 'main.js',
+  // },
 };
