@@ -1,2 +1,7 @@
 import './styles.scss';
-import * as bootstrap from 'bootstrap';
+import validatorForForm from './validator.js';
+import init from './init.js';
+
+const state = init();
+
+validatorForForm(state);
