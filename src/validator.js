@@ -1,9 +1,25 @@
 import * as yup from 'yup';
 import { string } from 'yup';
-import _ from 'lodash';
+import i18next from 'i18next';
 import watchStateForForm from './view.js';
+import resources from './local/index.js';
+
+const i18nInstance = i18next.createInstance();
+i18nInstance.init({
+  lng: 'ru',
+  debug: false,
+  resources,
+});
 
 const validator = (fields) => {
+  yup.setLocale({
+    mixed: {
+      notOneOf: () => 'alreadyExist',
+    },
+    string: {
+      url: () => 'invalid',
+    },
+  });
   const schema = yup.object().shape({
     currentUrl: string().url().notOneOf(fields.addedUrls),
   });
@@ -13,17 +29,11 @@ const validator = (fields) => {
       throw error;
     });
 };
-
-function errorHandlers(errMessage) {
-  if (_.includes(errMessage, 'currentUrl must be a valid URL')) {
-    return 'Ссылка должна быть валидным URL';
-  }
-  return 'RSS уже существует';
-}
+// console.log(await validator({ currentUrl: 'aasd', addedUrls: [''] }));
 
 export default function validatorForForm(state) {
   const { formState } = state;
-  const watchState = watchStateForForm(formState);
+  const watchedState = watchStateForForm(formState);
   const form = document.querySelector('form');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -32,12 +42,12 @@ export default function validatorForForm(state) {
     formState.data.currentUrl = url;
     validator(formState.data)
       .then((validUrl) => {
-        watchState.isValid = true;
+        watchedState.isValid = true;
         formState.data.addedUrls.push(validUrl);
-        watchState.error = '';
+        watchedState.error = '';
       }).catch((err) => {
-        watchState.isValid = false;
-        watchState.error = errorHandlers(err.message);
+        watchedState.isValid = false;
+        watchedState.error = i18nInstance.t(err.message);
       });
     form.reset();
   });
