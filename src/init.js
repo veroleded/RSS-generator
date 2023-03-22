@@ -1,13 +1,16 @@
 export default function init() {
   const state = {
     formState: {
-      isValid: true,
+      sending: 'on',
+      isValid: '',
       data: {
         currentUrl: '',
         addedUrls: [],
       },
-      error: '',
+      feedbackMessage: '',
     },
+    feeds: [],
+    posts: [],
   };
 
   return state;

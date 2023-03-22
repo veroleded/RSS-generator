@@ -1,7 +1,10 @@
 import './styles.scss';
-import validatorForForm from './validator.js';
+import app from './app.js';
 import init from './init.js';
+// import parse from './parser.js';
 
 const state = init();
 
-validatorForForm(state);
+app(state);
+
+// parse('https://ru.hexlet.io/lessons.rss');
