@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { uniqueId } from 'lodash';
 // https://allorigins.hexlet.app/raw?url=https://example.org/
-const proxy = 'https://allorigins.hexlet.app/raw?url=';
-
+const proxy = 'https://allorigins.hexlet.app/raw?disableCache=true&url=';
+// 'https://allorigins.hexlet.app/raw?url='
 // 'https://allorigins.hexlet.app/get?disableCache=true&url='
 
 export default function parser(url) {

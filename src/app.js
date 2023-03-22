@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import { watchStateForForm, feedsRender, postsRender } from './view.js';
+import { watchStateForForm, watchStateForFeedsAndPosts } from './view.js';
 import formValidator from './validator.js';
 import resources from './local/index.js';
 import parser from './parser.js';
@@ -13,7 +13,8 @@ i18nInstance.init({
 
 export default function app(state) {
   const { formState } = state;
-  const watchedState = watchStateForForm(formState);
+  const watchedStateForm = watchStateForForm(formState);
+  const wacthedStateFeedsAndPosts = watchStateForFeedsAndPosts(state);
   const form = document.querySelector('form');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -22,23 +23,24 @@ export default function app(state) {
     formState.data.currentUrl = url;
     formValidator(formState.data)
       .then((validUrl) => {
-        watchedState.sending = 'on';
+        watchedStateForm.sending = 'on';
         return parser(validUrl);
       })
       .then(({ feed, posts }) => {
-        state.feeds.push(feed);
-        state.posts.push(...posts);
-        watchedState.sending = 'off';
-        watchedState.isValid = true;
         formState.data.addedUrls.push(url);
-        watchedState.feedbackMessage = i18nInstance.t('validRss');
-        feedsRender(state);
-        postsRender(state);
-        console.log(state);
+        wacthedStateFeedsAndPosts.feeds = [feed, ...state.feeds];
+        wacthedStateFeedsAndPosts.posts = [...posts, ...state.posts];
+        // state.feeds.push(feed);
+        // state.posts.push(...posts);
+        watchedStateForm.sending = 'off';
+        watchedStateForm.isValid = true;
+        watchedStateForm.feedbackMessage = i18nInstance.t('validRss');
+        // feedsRender(state);
+        // postsRender(state);
       }).catch((err) => {
-        watchedState.sending = 'off';
-        watchedState.isValid = false;
-        watchedState.feedbackMessage = i18nInstance.t(err);
+        watchedStateForm.sending = 'off';
+        watchedStateForm.isValid = false;
+        watchedStateForm.feedbackMessage = i18nInstance.t(err);
       });
     form.reset();
   });

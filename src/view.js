@@ -7,12 +7,10 @@ export const watchStateForForm = (state) => onChange(state, (path, value) => {
   switch (path) {
     case 'isValid':
       if (value) {
-        console.log(123);
         inputClassList.remove('is-invalid');
         feedback.classList.remove('text-danger');
         feedback.classList.add('text-success');
       } else {
-        console.log('321');
         inputClassList.add('is-invalid');
         feedback.classList.replace('text-success', 'text-danger');
       }
@@ -35,7 +33,7 @@ export const watchStateForForm = (state) => onChange(state, (path, value) => {
   }
 });
 
-export const feedsRender = (state) => {
+const feedsRender = (feeds) => {
   const feedsContainer = document.querySelector('.feeds');
   feedsContainer.childNodes.forEach((el) => el.remove());
 
@@ -52,7 +50,7 @@ export const feedsRender = (state) => {
   const ol = document.createElement('ol');
   ol.classList.add('list-group');
 
-  state.feeds.forEach((feed) => {
+  feeds.forEach((feed) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'shadow');
 
@@ -79,7 +77,7 @@ export const feedsRender = (state) => {
   feedsContainer.append(allDiv);
 };
 
-export const postsRender = (state) => {
+const postsRender = (posts) => {
   const postContainer = document.querySelector('.posts');
   postContainer.childNodes.forEach((el) => el.remove());
 
@@ -96,7 +94,7 @@ export const postsRender = (state) => {
   const ul = document.createElement('ul');
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
-  state.posts.forEach((post) => {
+  posts.forEach((post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'justify-content-between', 'd-flex', 'shadow'); // ,'d-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0'
 
@@ -123,6 +121,18 @@ export const postsRender = (state) => {
   allDiv.append(divForTitle, ul);
   postContainer.append(allDiv);
 };
-// const watchStateForFeedsAndPosts = (state) => onChange(state, (path, value) => {
 
-// });
+export const watchStateForFeedsAndPosts = (state) => onChange(state, (path, value) => {
+  switch (path) {
+    case 'feeds':
+      feedsRender(value);
+      break;
+
+    case 'posts':
+      postsRender(value);
+      break;
+
+    default:
+      break;
+  }
+});
