@@ -3,6 +3,8 @@ import { watchStateForForm, watchStateForFeedsAndPosts, watchUiState } from './v
 import formValidator from './validator.js';
 import resources from './local/index.js';
 import parser from './parser.js';
+import timingUpdate from './postupdate.js';
+import initState from './init.js';
 
 const i18nInstance = i18next.createInstance();
 i18nInstance.init({
@@ -11,12 +13,14 @@ i18nInstance.init({
   resources,
 });
 
-export default function app(state) {
+export default function app() {
+  const state = initState();
   const { formState } = state;
   const watchedStateForm = watchStateForForm(formState);
   const wacthedStateFeedsAndPosts = watchStateForFeedsAndPosts(state);
   const watchedUiState = watchUiState(state.uiState);
   const form = document.querySelector('form');
+  const postsContainer = document.querySelector('.posts');
 
   const modalContainer = document.querySelector('.modal');
   const closeButtonMain = modalContainer.querySelector('.modal-footer').querySelector('button');
@@ -47,26 +51,26 @@ export default function app(state) {
         watchedStateForm.sending = 'off';
         watchedStateForm.isValid = true;
         watchedStateForm.feedbackMessage = i18nInstance.t('validRss');
-        // const previewButtons = document.querySelector('.posts').querySelectorAll('.btn');
-        const postsContainer = document.querySelector('.posts');
-
-        postsContainer.addEventListener('click', (event) => {
-          if (event.target.hasAttribute('data-id')) {
-            const { id } = event.target.dataset;
-            watchedUiState.readedPosts.push(id);
-
-            if (event.target.tagName === 'BUTTON') {
-              const valueForModal = state.posts.find((post) => post.id === id);
-              watchedUiState.modal.values = valueForModal;
-              watchedUiState.modal.status = 'shown';
-            }
-          }
-        });
       }).catch((err) => {
         watchedStateForm.sending = 'off';
         watchedStateForm.isValid = false;
         watchedStateForm.feedbackMessage = i18nInstance.t(err);
       });
     form.reset();
+  });
+
+  timingUpdate(state);
+
+  postsContainer.addEventListener('click', (event) => {
+    if (event.target.hasAttribute('data-id')) {
+      const { id } = event.target.dataset;
+      watchedUiState.readedPosts.push(id);
+
+      if (event.target.tagName === 'BUTTON') {
+        const valueForModal = state.posts.find((post) => post.id === id);
+        watchedUiState.modal.values = valueForModal;
+        watchedUiState.modal.status = 'shown';
+      }
+    }
   });
 }

@@ -1,16 +1,19 @@
 import axios from 'axios';
 import { uniqueId } from 'lodash';
-// https://allorigins.hexlet.app/raw?url=https://example.org/
-const proxy = 'https://allorigins.hexlet.app/raw?disableCache=true&url=';
-// 'https://allorigins.hexlet.app/raw?url='
-// 'https://allorigins.hexlet.app/get?disableCache=true&url='
+
+const constructUrl = (link) => {
+  const newUrl = new URL('https://allorigins.hexlet.app/get');
+  newUrl.searchParams.set('disableCache', 'true');
+  newUrl.searchParams.set('url', link);
+  return newUrl;
+};
 
 export default function parser(url) {
-  return axios.get(`${proxy}${url}`)
+  return axios.get(constructUrl(url))
     .then((response) => response.data)
     .then((data) => {
       const DomParser = new DOMParser();
-      const parsedRss = DomParser.parseFromString(data, 'application/xhtml+xml');
+      const parsedRss = DomParser.parseFromString(data.contents, 'application/xml');
       if (parsedRss.querySelector('parsererror')) {
         throw new Error('invalidRss');
       } else {
