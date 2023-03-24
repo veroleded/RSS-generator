@@ -1,13 +1,20 @@
-export default function init() {
+export default function initState() {
   const state = {
     formState: {
-      sending: 'on',
+      sending: 'off',
       isValid: '',
       data: {
         currentUrl: '',
         addedUrls: [],
       },
       feedbackMessage: '',
+    },
+    uiState: {
+      readedPosts: [],
+      modal: {
+        values: {},
+        status: 'hidden',
+      },
     },
     feeds: [],
     posts: [],

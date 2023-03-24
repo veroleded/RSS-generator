@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import { watchStateForForm, watchStateForFeedsAndPosts } from './view.js';
+import { watchStateForForm, watchStateForFeedsAndPosts, watchUiState } from './view.js';
 import formValidator from './validator.js';
 import resources from './local/index.js';
 import parser from './parser.js';
@@ -15,28 +15,53 @@ export default function app(state) {
   const { formState } = state;
   const watchedStateForm = watchStateForForm(formState);
   const wacthedStateFeedsAndPosts = watchStateForFeedsAndPosts(state);
+  const watchedUiState = watchUiState(state.uiState);
   const form = document.querySelector('form');
+
+  const modalContainer = document.querySelector('.modal');
+  const closeButtonMain = modalContainer.querySelector('.modal-footer').querySelector('button');
+  const closeButton = modalContainer.querySelector('.modal-header').querySelector('button');
+
+  closeButtonMain.addEventListener('click', () => {
+    watchedUiState.modal.status = 'hidden';
+  });
+
+  closeButton.addEventListener('click', () => {
+    watchedUiState.modal.status = 'hidden';
+  });
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = formData.get('url').trim();
+
     formState.data.currentUrl = url;
+    watchedStateForm.sending = 'on';
+
     formValidator(formState.data)
-      .then((validUrl) => {
-        watchedStateForm.sending = 'on';
-        return parser(validUrl);
-      })
+      .then((validUrl) => parser(validUrl))
       .then(({ feed, posts }) => {
         formState.data.addedUrls.push(url);
         wacthedStateFeedsAndPosts.feeds = [feed, ...state.feeds];
         wacthedStateFeedsAndPosts.posts = [...posts, ...state.posts];
-        // state.feeds.push(feed);
-        // state.posts.push(...posts);
         watchedStateForm.sending = 'off';
         watchedStateForm.isValid = true;
         watchedStateForm.feedbackMessage = i18nInstance.t('validRss');
-        // feedsRender(state);
-        // postsRender(state);
+        // const previewButtons = document.querySelector('.posts').querySelectorAll('.btn');
+        const postsContainer = document.querySelector('.posts');
+
+        postsContainer.addEventListener('click', (event) => {
+          if (event.target.hasAttribute('data-id')) {
+            const { id } = event.target.dataset;
+            watchedUiState.readedPosts.push(id);
+
+            if (event.target.tagName === 'BUTTON') {
+              const valueForModal = state.posts.find((post) => post.id === id);
+              watchedUiState.modal.values = valueForModal;
+              watchedUiState.modal.status = 'shown';
+            }
+          }
+        });
       }).catch((err) => {
         watchedStateForm.sending = 'off';
         watchedStateForm.isValid = false;

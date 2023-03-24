@@ -12,9 +12,7 @@ export default function parser(url) {
       const DomParser = new DOMParser();
       const parsedRss = DomParser.parseFromString(data, 'application/xhtml+xml');
       if (parsedRss.querySelector('parsererror')) {
-        const parserError = new Error('parserError');
-        parserError.status = 'invalidRss';
-        throw parserError;
+        throw new Error('invalidRss');
       } else {
         const feedTitle = parsedRss.querySelector('title').textContent;
         const feedDescription = parsedRss.querySelector('description').textContent;
@@ -25,24 +23,23 @@ export default function parser(url) {
         items.forEach((item) => {
           const title = item.querySelector('title').textContent;
           const link = item.querySelector('link').textContent;
-          const guid = item.querySelector('guid').textContent;
+          const description = item.querySelector('description').textContent;
           const pubDate = item.querySelector('pubDate').textContent;
           const id = uniqueId();
           const post = {
             title,
             link,
-            guid,
+            description,
             pubDate,
             id,
           };
 
           posts.push(post);
         });
-        const postsCounter = posts.length;
-        feed.postsCounter = postsCounter;
         return { feed, posts };
       }
     }).catch((err) => {
-      throw err.status;
+      const error = err.message === 'invalidRss' ? new Error('invalidRss') : new Error('networkError');
+      throw error.message;
     });
 }

@@ -63,12 +63,12 @@ const feedsRender = (feeds) => {
 
     const description = document.createTextNode(feed.feedDescription);
 
-    const span = document.createElement('span');
-    span.classList.add('badge', 'bg-primary', 'rounded-pill');
-    span.textContent = `отслеживаеся: ${feed.postsCounter}`;
+    // const span = document.createElement('span');
+    // span.classList.add('badge', 'bg-primary', 'rounded-pill');
+    // span.textContent = `отслеживаеся: ${feed.postsCounter}`;
 
     div.append(titleDiv, description);
-    li.append(div, span);
+    li.append(div); // span
     ol.append(li);
   });
 
@@ -96,7 +96,7 @@ const postsRender = (posts) => {
 
   posts.forEach((post) => {
     const li = document.createElement('li');
-    li.classList.add('list-group-item', 'justify-content-between', 'd-flex', 'shadow'); // ,'d-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0'
+    li.classList.add('list-group-item', 'justify-content-between', 'd-flex', 'shadow', 'border-0'); // ,'d-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0'
 
     const a = document.createElement('a');
     a.setAttribute('href', post.link);
@@ -130,6 +130,50 @@ export const watchStateForFeedsAndPosts = (state) => onChange(state, (path, valu
 
     case 'posts':
       postsRender(value);
+      break;
+
+    default:
+      break;
+  }
+});
+
+export const watchUiState = (state) => onChange(state, (path, value) => {
+  const { body } = document;
+  const modalContainer = document.querySelector('.modal');
+  const titleEl = modalContainer.querySelector('.modal-title');
+  const contentBodyEl = modalContainer.querySelector('.modal-body');
+  const linkButtonEl = modalContainer.querySelector('a');
+  switch (path) {
+    case 'readedPosts':
+      value.forEach((id) => {
+        document.querySelector(`[data-id="${id}"]`).classList.replace('fw-bold', 'fw-normal');
+      });
+      break;
+    case 'modal.values': {
+      titleEl.textContent = value.title;
+      contentBodyEl.textContent = value.description;
+      linkButtonEl.href = value.link;
+      break;
+    }
+
+    case 'modal.status':
+      if (value === 'shown') {
+        body.classList.add('modal-open');
+        body.setAttribute('style', 'overflow: hidden; padding-right: 0px;');
+        modalContainer.classList.add('show', 'bg-opacity-75', 'bg-dark');
+        modalContainer.setAttribute('style', 'display: block;');
+        modalContainer.setAttribute('role', 'dialog');
+        modalContainer.setAttribute('aria-modal', 'true');
+        modalContainer.removeAttribute('aria-hidden');
+      } else {
+        body.classList.remove('modal-open', 'bg-opacity-75', 'bg-dark');
+        body.removeAttribute('style');
+        modalContainer.classList.remove('show');
+        modalContainer.setAttribute('style', 'display: none;');
+        modalContainer.removeAttribute('role');
+        modalContainer.removeAttribute('aria-modal');
+        modalContainer.setAttribute('aria-hidden', 'true');
+      }
       break;
 
     default:
