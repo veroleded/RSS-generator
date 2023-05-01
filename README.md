@@ -5,5 +5,6 @@
 
 [![Actions Status](https://github.com/veroleded/fullstack-javascript-project-11/actions/workflows/build-and-linter-check.yml/badge.svg)](https://github.com/veroleded/fullstack-javascript-project-11/actions)
 
-##Link
+## Link
+
 https://rssaggregator-theta.vercel.app/
